@@ -1,0 +1,175 @@
+{
+    "MeiliVariables":
+	{
+		"Music": { "varType": "SOUND", "audioChannel": "Soundtrack", "loop": true, "fileURI": "music.mp3", "comment": "" },
+		"Footsteps": { "varType": "SOUND", "audioChannel": "Footsteps", "loop": true, "fileURI": "footsteps.mp3", "comment": "" },
+		"Monster1": { "varType": "SOUND", "audioChannel": "Monster1", "loop": false, "fileURI": "monster.mp3", "comment": "" },
+        "MonsterDie": { "varType": "SOUND", "audioChannel": "Monster1", "loop": false, "fileURI": "monsterdies.mp3", "comment": "" },
+		"SampleSpeech": { "varType": "SOUND", "speechChannel": "Monster1", "loop": false, "fileURI": "monster.mp3", "comment": "" },
+		"Laser": { "varType": "SOUND", "audioChannel": "Lasers", "loop": false, "fileURI": "laser.mp3", "comment": "" },
+		"Sword": { "varType": "SOUND", "audioChannel": "Lasers", "loop": false, "fileURI": "sword.mp3", "comment": "" },
+		"Goal": { "varType": "NUMBER", "startingValue":1000, "minValue":1, "maxValue":1000, "comment":""},
+		"ShowHUD": { "varType": "NUMBER", "startingValue":1, "minValue":0, "maxValue":1, "comment":""},
+		"Steps": { "varType": "NUMBER", "startingValue":0, "minValue":0, "maxValue":100000, "comment":"Used to hold steps"},
+        "Progress": { "varType": "NUMBER", "startingValue":0, "minValue":0, "maxValue":100, "comment":""},
+        "MonsterHP": { "varType": "NUMBER", "startingValue":10, "minValue":0, "maxValue":10, "comment":""},
+		"Monsterrandom": { "varType": "NUMBER", "startingValue":0, "minValue":0, "maxValue":100, "comment":""},
+        "MonsterKills": { "varType": "NUMBER", "startingValue": 0, "minValue": 0, "maxValue":1000, "comment": "" },
+        "Button1": { "varType": "STRING", "startingValue": "Start", "comment": "" },
+		"StillDetecter": {"varType":"SHAKEACCUMULATOR", "startingValue":0, "maxValue": 100, "shakeLostPerSecond": 25, "comment":""},
+		"StepKeeper": { "varType": "STEPACCUMULATOR", "startingValue": 0, "stepsLostPerSecond": 0, "comment": "" },
+        "StillFlag": {"varType": "NUMBER", "startingValue":1, "minValue":0, "maxValue":10, "comment":""},
+        
+	"CalcProgress":
+	{
+	"varType":"MACRO",
+	"actionArray":
+	[
+	{"actionType":"CHANGEBYVAR", "leftVar":"Steps", "changeOperator":"=", "rightVar":"StepKeeper"},
+    {"actionType":"CHANGEBYVAR", "resultVar":"Progess", "leftVar":"Steps", "changeOperator":"/", "rightVar":"Goal"}
+	]
+	}
+
+	},
+    
+    "MeiliEvents":
+	{
+	
+	"Startup":
+        {
+            "eventTrigger": { "triggerType": "ONAREAENTER" },
+            "comment": "",
+            "maxTriggerCount": 1,
+            "secondsBeforeRetriggering": 0,
+            "conditions": [],
+            "actionsUponSuccess":
+			[
+				{"actionType":"PLAYAUDIO", "audioVariable":"Music"},
+                {"actionType":"ADDBUTTON", "stringVar": "Button1" }
+			],
+            "actionsUponFailure": []
+        },
+
+
+		"Start":
+        {
+            "eventTrigger": { "triggerType": "ONBUTTONCHOICE", "stringVar": "Button1" },
+            "comment": "",
+            "maxTriggerCount": -1,
+            "secondsBeforeRetriggering": 0,
+            "conditions": [],
+            "actionsUponSuccess":
+			[
+			{"actionType":"CHANGEBYVALUE", "leftVar":"StepKeeper", "changeOperator":"=", "rightVal":0}
+            ],
+            "actionsUponFailure": []
+        },
+
+
+
+
+ 		"Event0":
+        {
+            "eventTrigger": { "triggerType": "ONINTERVAL" },
+            "comment": "",
+            "secondsBeforeRetriggering": 1,
+            "conditions":
+			[
+		    ],
+            "actionsUponSuccess":
+			[
+            {"actionType":"CHANGEBYVAR", "leftVar":"Steps", "changeOperator":"=", "rightVar":"StepKeeper"},
+            {"actionType":"CHANGEBYVAR", "resultVar":"Progress", "leftVar":"Steps", "changeOperator":"/", "rightVar":"Goal"},
+            {"actionType":"SHOWVAR", "varName":"MonsterHP", "prefix":"", "suffix":""}
+			],
+            "actionsUponFailure": 
+            [
+            ]
+        },
+        
+        
+ 		"EventLaser":
+        {
+            "eventTrigger": {"triggerType":"ONGESTURE", "acceptedGestures": ["TAP"]},
+            "comment": "",
+            "secondsBeforeRetriggering": 0,
+            "conditions":
+			[
+            
+		    ],
+            "actionsUponSuccess":
+			[
+			{"actionType":"PLAYAUDIO", "audioVariable":"Laser"}
+			],
+            "actionsUponFailure": 
+            [
+            ]
+        },
+        
+ 		"EventSword":
+        {
+            "eventTrigger": {"triggerType":"ONGESTURE", "acceptedGestures": ["DOUBLETAP"]},
+            "comment": "",
+            "secondsBeforeRetriggering": 0,
+            "conditions":
+			[
+            
+            
+		    ],
+            "actionsUponSuccess":
+			[
+			{"actionType":"PLAYAUDIO", "audioVariable":"Sword"},
+            {"actionType":"CHANGEBYVALUE", "resultVar":"MonsterHP", "leftVar":"MonsterHP", "changeOperator":"-", "rightVal":4, "randomDeviation":1},
+            {"actionType":"TRIGGEREVENT", "listenerName":"EventKillMonster"}
+			],
+            "actionsUponFailure": 
+            [
+            ]
+        },
+        
+        "EventKillMonster":
+        {
+            "eventTrigger": {"triggerType":"ONCUSTOMERTRIGGER"},
+            "comment": "",
+            "secondsBeforeRetriggering": 0,
+            "conditions":
+            [
+            {"conditionType":"COMPAREVALUE", "leftVar":"MonsterHP", "compareOperator":"<=", "rightVal":0}
+            ],
+            "actionsUponSuccess":
+            [
+             {"actionType":"PLAYAUDIO", "audioVariable":"MonsterDie"},
+             {"actionType":"CHANGEBYVALUE", "leftVar":"MonsterHP", "changeOperator":"=", "rightVal":10},
+             {"actionType":"CHANGEBYVALUE", "leftVar":"Monsterrandom", "changeOperator":"=", "rightVal":0}
+             ],
+            "actionsUponFailure":
+            [
+            ]
+        },
+        
+        "EventToggleButtons":
+        {
+        	"eventTrigger": {"triggerType":"ONGESTURE", "acceptedGestures": ["TRIPLETAP"]},
+            "comment": "",
+            "secondsBeforeRetriggering": 0,
+            "conditions":
+			[
+			{"conditionType":"COMPAREVALUE", "leftVar":"ShowHUD", "compareOperator":">", "rightVal":0}
+		    ],
+            "actionsUponSuccess":
+			[
+			{"actionType":"HIDEBUTTONS"},
+			{"actionType":"HIDEINTERFACE"},
+			{"actionType":"CHANGEBYVALUE", "leftVar":"ShowHUD", "changeOperator":"=", "rightVal":0},
+			{"actionType":"SHOWVAR", "varName":"ShowHUD", "prefix":"Set SHOWHUD To: ", "suffix":""}
+			],
+            "actionsUponFailure":
+            [
+			{"actionType":"SHOWBUTTONS"},
+			{"actionType":"SHOWINTERFACE"},
+			{"actionType":"CHANGEBYVALUE", "leftVar":"ShowHUD", "changeOperator":"=", "rightVal":1},
+			{"actionType":"SHOWVAR", "varName":"ShowHUD", "prefix":"Set SHOWHUD To: ", "suffix":""}
+            ]
+    	}
+    }
+}

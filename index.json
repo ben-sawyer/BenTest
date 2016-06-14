@@ -1,0 +1,25 @@
+{
+	"GameIconURL":"",
+	"GameTitle":"Footsteps",
+	"GameDescription":"Walking and Aliens",
+	"GlobalAreaFile":"footsteps.json",
+	"AudioChannelDefinitions":
+	{
+		"Monsters":
+		{
+			"channelVolume0to1":6
+		},
+		"Lasers":
+		{
+			"channelVolume0to1":1
+		},
+		"Footsteps":
+		{
+			"channelVolume0to1":0.8
+		},
+		"Soundtrack":
+		{
+			"channelVolume0to1":0.3
+		}
+	}	
+}
